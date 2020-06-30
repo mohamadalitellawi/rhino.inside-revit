@@ -206,7 +206,14 @@ def find_revit_binary(revit_year):
 
 
 def run_revit(revit_year, journal_file, wait_until=None, timeout=600):
-    """Launch given revit version with given journal file"""
+    """Launch given revit version with given journal file
+
+    Args:
+        revit_year (str): Revit year e.g. 2019
+        journal_file (str): path to journal file
+        wait_until (function): wait for process until this func returns True
+        timeout (int): time out after this many seconds
+    """
     # find revit binary
     revit_path = find_revit_binary(revit_year)
     journal_file = op.abspath(journal_file)

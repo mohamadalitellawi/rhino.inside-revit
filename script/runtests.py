@@ -105,8 +105,7 @@ class GHTestCase:
                 check = '\033[32mPASS\033[0m' if res == RESULT_OK \
                     else '\033[31mFAIL\033[0m'
                 failed_any |= not res == RESULT_OK
-                print(f"[ {check} ] "
-                      f"version={revit_version} test={name} component={comp}")
+                print(f"[ {check} ] @{revit_version} \"{name}\" <{comp}>")
         return failed_any
 
     def setUp(self):
