@@ -242,8 +242,4 @@ if __name__ == '__main__':
     # gracefully handle exceptions and print results
     except Exception as run_ex:
         logging.critical(run_ex)
-        raise run_ex
         exit(1)
-
-
-# TODO: fix run logic to it runs by revit version
