@@ -16,6 +16,8 @@ import os
 import os.path as op
 import re
 import subprocess
+import logging
+import time
 
 # pipenv dependencies
 from docopt import docopt
@@ -90,7 +92,7 @@ def clean_cache(cache_dir):
             try:
                 os.remove(entry_path)
             except Exception as del_ex:
-                print('Error removing {} | {}'.format(entry_path, str(del_ex)))
+                logging.debug('Error removing %s | %s', entry_path, str(del_ex))
 
 
 def prepare_cache():
@@ -203,17 +205,32 @@ def find_revit_binary(revit_year):
                                                                 bin_path))
 
 
-def run_revit(revit_year, journal_file):
+def run_revit(revit_year, journal_file, wait_until=None, timeout=600):
     """Launch given revit version with given journal file"""
     # find revit binary
     revit_path = find_revit_binary(revit_year)
     journal_file = op.abspath(journal_file)
     # launch Revit and wait
-    print('running: %s %s' % (revit_path, journal_file))
-    subprocess.run([revit_path, journal_file])
+    logging.info('running: %s %s', revit_path, journal_file)
+    if wait_until:
+        # open process and wait until wait_until returns True
+        rp = subprocess.Popen([revit_path, journal_file])
+        counter = 0
+        while not wait_until() and counter < timeout:
+            # wait a bit so we don't run into race conditions
+            # with resource accesses happening in wait_until()
+            # and the running process. this is also one timeout cycle
+            time.sleep(1)
+            counter += 1
+        # we waited until, or timed out
+        # time to kill process
+        rp.kill()
+    else:
+        # otherwise open process and wait for it to close
+        subprocess.run([revit_path, journal_file])
 
 
-def run_command(cfg: CLIArgs):
+def run_command(cfg: CLIArgs, wait_until=None):
     """Orchestrate execution using command line options"""
     # prepare cache -------------------
     cache_dir = prepare_cache()
@@ -230,7 +247,7 @@ def run_command(cfg: CLIArgs):
 
     # run revit -----------------------
     if cfg.start_revit:
-        run_revit(cfg.revit_year, journal_file)
+        run_revit(cfg.revit_year, journal_file, wait_until=wait_until)
 
 
 if __name__ == '__main__':
@@ -248,5 +265,5 @@ if __name__ == '__main__':
         )
     # gracefully handle exceptions and print results
     except Exception as run_ex:
-        print(str(run_ex))
+        logging.critical(run_ex)
         sys.exit(1)
