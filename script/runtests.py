@@ -10,6 +10,7 @@ Options:
     <revit_year>        Revit version to be tested (e.g. 2019)
 """
 #pylint: disable=broad-except,global-statement,invalid-name
+import sys
 import os
 import os.path as op
 import re
@@ -26,6 +27,9 @@ import dbgrevit
 # cli info
 __binname__ = op.splitext(op.basename(__file__))[0] # grab script name
 __version__ = '1.0'
+
+# globals
+EPSILON = sys.float_info.epsilon
 
 # =============================================================================
 # Configs
@@ -76,7 +80,15 @@ class GHTestCase:
         for ghmodel in self.gh_models:
             if ghmodel.version == revit_version:
                 return ghmodel
-        return max(self.gh_models, key=lambda x: x.version)
+        # this part finds the closest compatible file version to the given
+        # revit_version. e.g. for Revit 2020, it returns R20 or
+        # max of file versions below 20 (above 20 can not be opened in 2020)
+        # epsilon is used to make sure div-by-zero does not occur
+        rev_version = revit_version % 2000
+        return max(
+            self.gh_models,
+            key=lambda x: 1/(rev_version - x.version + EPSILON)
+            )
 
     def run_model_test(self, revit_version: int, ghmodel: GHTestModel):
         """Run GH test on specified Revit version and model"""
