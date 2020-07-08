@@ -255,3 +255,8 @@ if __name__ == '__main__':
     except Exception as run_ex:
         logging.critical(run_ex)
         exit(1)
+
+
+# TODO: multiple tests in one Revit instance
+# TODO: multiple revit versions at the same time
+# TODO: maybe improve brontosaurus to be more configurable and reduce the complexity on our side
