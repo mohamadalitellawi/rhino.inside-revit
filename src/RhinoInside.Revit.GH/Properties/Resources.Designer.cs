@@ -243,6 +243,16 @@ namespace RhinoInside.Revit.GH.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap AnalyzeFootPrintRoof {
+            get {
+                object obj = ResourceManager.GetObject("AnalyzeFootPrintRoof", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap AnalyzeInstanceSpace {
             get {
                 object obj = ResourceManager.GetObject("AnalyzeInstanceSpace", resourceCulture);
